@@ -1,0 +1,24 @@
+# Build Folders
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio / IDE
+.vs/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+restore_log.txt
+build_log.txt
+
+# Local files (Triggers, etc.)
+trigger.txt
+_trigger.txt
+
+# OS Files
+Thumbs.db
+Desktop.ini
