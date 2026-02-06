@@ -14,11 +14,22 @@
 **Also, are your Windows notifications bugged and silent?**
 If you work with **Antigravity**, add this to your AI rules to ensure it actually triggers the notification:
 ```markdown
-## NOTIFICATIONS
-No matter what, as soon as a task is finished (partial or complete) THE AI MUST IMMEDIATELY call notify_user
-No task can end without calling notify_user
+# NOTIFICATIONS
+
+**Any task completed (partial or full) → `notify_user` mandatory.**
+No task can end without calling notify_user.
 ```
 Then run this app, and your AI will finally have a voice!
+
+### ⚙️ VS Code / Antigravity Settings
+Add these lines to your `settings.json` to ensure notifications are sent:
+```json
+  "antigravity.agent.notifications.desktop": "always",
+  "antigravity.agent.notifications.sound": true,
+  "antigravity.agent.notifyOnTaskCompletion": true,
+  "antigravity.agent.notifyOnUserActionRequired": true,
+  "java.showBuildStatusOnStart.enabled": "notification"
+```
 
 ### 💡 The Solution
 **Notificatosorusator** is a lightweight **Audio Bridge** for Windows. It allows AI Agents (like those running in VS Code, Cursor, or terminals) to trigger **real sound effects** in your physical environment, simply by sending a standard Windows Notification.
@@ -51,11 +62,22 @@ If this tool helps your workflow, consider supporting usage!
 **Vous aussi vos notifications Windows sont buguées et ne veulent pas émettre de son ?**
 Pas de soucis ! Si vous travaillez sur **Antigravity**, ajoutez ceci dans les règles de l'IA :
 ```markdown
-## NOTIFICATIONS
-Quoi qu’il arrive, dès qu’une tâche est terminée (partielle ou complète) L’IA DOIT IMMÉDIATEMENT appeler notify_user
-Aucune tâche ne peut se terminer sans appeler notify_user
+# NOTIFICATIONS
+
+**Toute tâche terminée (partielle ou complète) → `notify_user` obligatoire.**
+Aucune tâche ne peut se terminer sans appeler notify_user.
 ```
 Activez ce programme, et l'IA vous préviendra par un son dès qu'elle a terminé ou qu'elle vous attend !
+
+### ⚙️ Réglages VS Code / Antigravity
+Ajoutez ces lignes dans votre `settings.json` pour garantir l'envoi des notifications :
+```json
+  "antigravity.agent.notifications.desktop": "always",
+  "antigravity.agent.notifications.sound": true,
+  "antigravity.agent.notifyOnTaskCompletion": true,
+  "antigravity.agent.notifyOnUserActionRequired": true,
+  "java.showBuildStatusOnStart.enabled": "notification"
+```
 
 ### 💡 La Solution
 **Notificatosorusator** est un **Pont Audio** léger pour Windows. Il permet aux agents IA de déclencher de **vrais effets sonores** dans votre environnement physique, simplement en envoyant une notification Windows standard.

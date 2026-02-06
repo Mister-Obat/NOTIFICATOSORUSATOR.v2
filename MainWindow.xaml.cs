@@ -103,6 +103,13 @@ namespace Notificatosorusator
 
                         Log($"[New Toast] App: {appName} | Content: {fullText}");
 
+                        // FILTER: Only allow Antigravity
+                        if (!appName.Contains("Antigravity", StringComparison.OrdinalIgnoreCase))
+                        {
+                            Log($"[Ignored] Source is not Antigravity.");
+                            continue;
+                        }
+
                         // LOGIC RULES
                         string lowerText = fullText.ToLowerInvariant();
 

@@ -16,6 +16,7 @@ It allows the AI to trigger sound alerts to catch the user's attention when task
 
 ### Method A: Automatic (Preferred)
 The application listens to **Windows Toast Notifications** emitted by the Agent (via `notify_user`).
+**Constraint:** The notification source (App Name) MUST be **"Antigravity"**.
 It parses the text content of the notification to decide which sound to play.
 
 **Audio Logic Rules:**
