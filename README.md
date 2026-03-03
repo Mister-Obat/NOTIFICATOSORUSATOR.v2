@@ -60,20 +60,41 @@ Remplacez les fichiers dans `Sounds/` :
 
 ---
 
-## 🔔 Addon (Astuce pour VS Code)
-L'astuce `notify.ps1` est un **addon optionnel pour VS Code** (notifications toast + beep), hors runtime principal de l'app.
+## 🔔 Addons IA (Global)
 
-Script global recommandé :
-`C:\Users\...\.codex\tools\notifications\notify.ps1`
-`C:\Users\...\.claude\notify.ps1`
+### Fichiers source (repo)
+- `addons/notifications/notify.ps1` : base toast (Claude + manuel)
+- `addons/notifications/notify.codex.ps1` : wrapper Codex (payload JSON)
 
-Copie d'exemple dans ce repo :
-`addons/notifications/notify.ps1`
+### Cibles globales
+- Claude: `C:\Users\<USER>\.claude\notify.ps1` <- `addons/notifications/notify.ps1`
+- Codex base: `C:\Users\<USER>\.codex\tools\notifications\notify.ps1` <- `addons/notifications/notify.ps1`
+- Codex wrapper: `C:\Users\<USER>\.codex\tools\notifications\codex-notify.ps1` <- `addons/notifications/notify.codex.ps1`
 
----
+### Config Codex requise (`C:\Users\<USER>\.codex\config.toml`)
+```toml
+notify = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\Users\\<USER>\\.codex\\tools\\notifications\\codex-notify.ps1"]
+
+[tui]
+notification_method = "bel"
+notifications = ["approval-requested"]
+```
+
+### Mapping Codex
+- `agent-turn-complete` -> `Stop`
+- `approval-requested` -> `PermissionRequest`
+
+### Limite importante
+- Sans clé `notify = [...]`, aucun script externe n'est lancé par Codex.
 
 ## 📜 License
 Ce projet est distribué sous licence AGPL-3.0.
 
 ---
 *Codé 100% par des IA, supervisé à l'arrache par Obat 😏*
+
+
+
+
+
+
