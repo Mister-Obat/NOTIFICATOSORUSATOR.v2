@@ -18,12 +18,17 @@ namespace Notificatosorusator
         private volatile bool _allowPowerShell = true;
         private volatile int _audioVolumePercent = 100;
         private bool _isUiReady;
+        private readonly Windows.Media.Playback.MediaPlayer _player;
 
 
         public MainWindow()
         {
             LoadPersistedVolume();
             InitializeComponent();
+            _player = new Windows.Media.Playback.MediaPlayer
+            {
+                AutoPlay = false
+            };
             VolumeSlider.Value = _audioVolumePercent;
             _isUiReady = true;
             ApplyUiSettings();
@@ -104,6 +109,22 @@ namespace Notificatosorusator
             {
                 SavePersistedVolume();
                 Log($"[Audio] Volume set to {Math.Round(VolumeSlider.Value):0}%");
+            }
+        }
+
+        private void DonateButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(
+                    new System.Diagnostics.ProcessStartInfo("https://www.paypal.com/paypalme/creaprisme")
+                    {
+                        UseShellExecute = true
+                    });
+            }
+            catch (Exception ex)
+            {
+                Log($"[UI] Unable to open donation link: {ex.Message}");
             }
         }
 
@@ -269,10 +290,14 @@ namespace Notificatosorusator
                 Log($"[Audio] Playing {id}...");
                 try
                 {
-                    var player = new Windows.Media.Playback.MediaPlayer();
-                    player.Source = Windows.Media.Core.MediaSource.CreateFromUri(new Uri(path));
-                    player.Volume = _audioVolumePercent / 100.0;
-                    player.Play();
+                    Dispatcher.Invoke(() =>
+                    {
+                        _player.Pause();
+                        _player.Source = null;
+                        _player.Volume = _audioVolumePercent / 100.0;
+                        _player.Source = Windows.Media.Core.MediaSource.CreateFromUri(new Uri(path));
+                        _player.Play();
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -283,6 +308,12 @@ namespace Notificatosorusator
             {
                 Log($"[Audio] File not found: {filename}");
             }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _player.Dispose();
+            base.OnClosed(e);
         }
 
         [DllImport("dwmapi.dll")]

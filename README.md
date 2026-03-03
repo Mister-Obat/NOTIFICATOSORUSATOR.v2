@@ -63,29 +63,49 @@ Remplacez les fichiers dans `Sounds/` :
 ## 🔔 Addons IA (Global)
 
 ### Fichiers source (repo)
-- `addons/notifications/notify.ps1` : base toast (Claude + manuel)
-- `addons/notifications/notify.codex.ps1` : wrapper Codex (payload JSON)
 
-### Cibles globales
-- Claude: `C:\Users\<USER>\.claude\notify.ps1` <- `addons/notifications/notify.ps1`
-- Codex base: `C:\Users\<USER>\.codex\tools\notifications\notify.ps1` <- `addons/notifications/notify.ps1`
-- Codex wrapper: `C:\Users\<USER>\.codex\tools\notifications\codex-notify.ps1` <- `addons/notifications/notify.codex.ps1`
+| Fichier | Rôle | Déployé vers |
+|---------|------|-------------|
+| `addons/notifications/notify.claude.ps1` | Base Claude — toast + beep, title "Claude Code", XML-escaped | `~/.claude/notify.ps1` |
+| `addons/notifications/notify.ps1` | Base Codex — même logique, title "Codex" | `~/.codex/tools/notifications/notify.ps1` |
+| `addons/notifications/notify.codex.ps1` | Wrapper Codex — parse payload JSON (argv / stdin / env), appelle notify.ps1 | `~/.codex/tools/notifications/codex-notify.ps1` |
 
-### Config Codex requise (`C:\Users\<USER>\.codex\config.toml`)
+### Déploiement Claude (`~/.claude/`)
+
+Copier `notify.claude.ps1` -> `~/.claude/notify.ps1`.
+
+Hooks requis dans `~/.claude/settings.json` :
+```json
+"hooks": {
+  "Stop":              [{ "hooks": [{ "type": "command", "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\Users\\<USER>\\.claude\\notify.ps1\"", "timeout": 15 }] }],
+  "Notification":      [{ "hooks": [{ "type": "command", "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\Users\\<USER>\\.claude\\notify.ps1\"", "timeout": 15 }] }],
+  "PermissionRequest": [{ "hooks": [{ "type": "command", "command": "powershell.exe -ExecutionPolicy Bypass -File \"C:\\Users\\<USER>\\.claude\\notify.ps1\"", "timeout": 15 }] }]
+}
+```
+
+### Déploiement Codex (`~/.codex/`)
+
+Copier `notify.ps1` -> `~/.codex/tools/notifications/notify.ps1`
+Copier `notify.codex.ps1` -> `~/.codex/tools/notifications/codex-notify.ps1`
+
+Config requise dans `~/.codex/config.toml` :
 ```toml
 notify = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "C:\\Users\\<USER>\\.codex\\tools\\notifications\\codex-notify.ps1"]
 
 [tui]
 notification_method = "bel"
-notifications = ["approval-requested"]
+notifications = ["task_started", "task_complete", "turn_aborted"]
 ```
 
-### Mapping Codex
-- `agent-turn-complete` -> `Stop`
-- `approval-requested` -> `PermissionRequest`
+### Mapping événements -> Event param
 
-### Limite importante
-- Sans clé `notify = [...]`, aucun script externe n'est lancé par Codex.
+| Événement runtime | `-Event` passé à notify.ps1 |
+|-------------------|-----------------------------|
+| `task_started` / `task_complete` / `turn_aborted` | `Stop` |
+
+### Limites Codex
+- La notification sur demande de commande (approval) n'est pas supportée — événement non exposé au hook `notify` dans le runtime VS Code. Cette feature fonctionne uniquement avec Claude (hook `PermissionRequest`).
+- Sans `notify = [...]` dans `config.toml`, Codex ne lance aucun script externe.
 
 ## 📜 License
 Ce projet est distribué sous licence AGPL-3.0.

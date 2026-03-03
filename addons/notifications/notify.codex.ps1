@@ -13,6 +13,30 @@ if (-not (Test-Path $baseScript)) {
 $type = "agent-turn-complete"
 $message = "Tache terminee."
 
+# Codex integrations may provide payload through argv, stdin, or env vars depending on runtime.
+if ([string]::IsNullOrWhiteSpace($PayloadJson)) {
+    try {
+        if ($MyInvocation.ExpectingInput) {
+            $stdinPayload = [Console]::In.ReadToEnd()
+            if (-not [string]::IsNullOrWhiteSpace($stdinPayload)) {
+                $PayloadJson = $stdinPayload.Trim()
+            }
+        }
+    } catch {
+        # Keep default when stdin is unavailable.
+    }
+}
+
+if ([string]::IsNullOrWhiteSpace($PayloadJson)) {
+    foreach ($envName in @("CODEX_NOTIFY_PAYLOAD", "CODEX_NOTIFICATION_PAYLOAD", "NOTIFY_PAYLOAD_JSON")) {
+        $envValue = [Environment]::GetEnvironmentVariable($envName)
+        if (-not [string]::IsNullOrWhiteSpace($envValue)) {
+            $PayloadJson = $envValue.Trim()
+            break
+        }
+    }
+}
+
 if (-not [string]::IsNullOrWhiteSpace($PayloadJson)) {
     try {
         $payload = $PayloadJson | ConvertFrom-Json -ErrorAction Stop
@@ -30,7 +54,7 @@ if (-not [string]::IsNullOrWhiteSpace($PayloadJson)) {
 
 switch ($type) {
     'approval-requested' {
-        & $baseScript -Event PermissionRequest -Title 'Codex' -Message 'Permission requise pour continuer.'
+        & $baseScript -Event PermissionRequest -Title 'Codex' -Message 'Permission command requise pour continuer.'
     }
     default {
         & $baseScript -Event Stop -Title 'Codex' -Message $message
